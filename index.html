@@ -42,13 +42,19 @@
         }
 
         @media print {
+            @page { size: portrait; margin: 0; }
             .no-print { display: none !important; }
-            body { background: white; padding: 0.5cm; }
-            .form-card { box-shadow: none; border: 1px solid #e2e8f0; border-radius: 0; padding: 1rem !important; }
-            .tab-content { display: block !important; }
-            textarea { border: 1px solid #cbd5e1 !important; height: auto !important; }
+            body { background: white; padding: 0; margin: 0; font-size: 9pt; }
+            .max-w-5xl { max-width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            .form-card { box-shadow: none !important; border: none !important; border-radius: 0 !important; padding: 1rem !important; margin: 0 !important; }
+            .p-8, .p-10 { padding: 0.75rem !important; }
+            .mt-16, .mt-12 { margin-top: 1rem !important; }
+            textarea { border: 1px solid #cbd5e1 !important; height: auto !important; min-height: 40px; }
+            section { margin-bottom: 0.75rem !important; }
             .service-option { border: 1px solid #e2e8f0 !important; }
             .service-option.active { background-color: #eff6ff !important; border-color: #3b82f6 !important; }
+            /* Ajuste estricto para una sola página */
+            html, body { height: 100%; overflow: hidden; }
         }
     </style>
 </head>
@@ -73,19 +79,20 @@
 
         <div class="form-card p-6 md:p-10">
             <!-- Header común Documento -->
-            <div class="text-center border-b pb-6 mb-8">
+            <div class="text-center border-b pb-4 mb-6">
                 <h2 class="text-2xl font-bold text-slate-800 uppercase mb-1">Prestación de Servicios Profesionales</h2>
                 <p class="text-slate-500 font-medium italic text-sm">Soporte Técnico y Mantenimiento de Equipo de Cómputo</p>
             </div>
 
             <!-- 1. SELECCIÓN DEL TIPO DE SOPORTE -->
-            <section class="mb-8">
+            <section class="mb-6">
                 <h3 class="text-blue-600 font-bold mb-4 text-xs uppercase tracking-widest flex items-center gap-2">
                     <span class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px]">1</span>
                     Seleccione el tipo de Soporte
                 </h3>
                 
-                <div id="selector-horas" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Opciones por Hora -->
+                <div id="selector-horas" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     <div id="card-hora-a" onclick="selectSimpleHora('A', this)" class="service-option active p-4 rounded-xl border border-slate-200">
                         <span class="text-[9px] font-bold text-blue-500 uppercase">Modalidad A</span>
                         <h4 class="font-bold text-slate-800 text-sm" id="lbl-h-a-name">Cargando...</h4>
@@ -103,7 +110,8 @@
                     </div>
                 </div>
 
-                <div id="selector-equipos" class="hidden no-print mb-6">
+                <!-- Opciones por Equipos -->
+                <div id="selector-equipos" class="hidden no-print mb-4">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100 items-end">
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tipo de Equipo</label>
@@ -115,9 +123,15 @@
                         </div>
                         <button onclick="addToList('equipos')" class="bg-slate-800 text-white p-2.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700 transition-colors shadow-sm">Agregar</button>
                     </div>
+                    <!-- LEYENDAS DE DESCUENTO -->
+                    <div class="mt-2 flex gap-4">
+                        <p class="text-[9px] font-bold text-emerald-600 uppercase italic">✓ Más de 5 equipos: 10% Descuento</p>
+                        <p class="text-[9px] font-bold text-emerald-700 uppercase italic">✓ Más de 10 equipos: 20% Descuento</p>
+                    </div>
                 </div>
 
-                <div id="selector-mixta" class="hidden no-print mb-6">
+                <!-- Opciones Mixta -->
+                <div id="selector-mixta" class="hidden no-print mb-4">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="p-4 border rounded-xl bg-slate-50 border-slate-200">
                             <p class="text-[10px] font-bold text-blue-600 uppercase mb-2">Servicios por Hora</p>
@@ -128,11 +142,15 @@
                             </div>
                         </div>
                         <div class="p-4 border rounded-xl bg-slate-50 border-slate-200">
-                            <p class="text-[10px] font-bold text-slate-600 uppercase mb-2">Equipos</p>
+                            <p class="text-[10px] font-bold text-slate-600 uppercase mb-1">Equipos</p>
                             <div class="flex gap-2">
                                 <select id="mix-e-tipo" class="flex-1 p-2 rounded border border-slate-300 text-xs bg-white"></select>
                                 <input type="number" id="mix-e-cant" value="1" min="1" class="w-14 p-2 rounded border border-slate-300 text-xs text-center font-bold bg-white">
                                 <button onclick="addToList('mixta-e')" class="bg-slate-800 text-white px-3 rounded text-[10px] font-bold uppercase">√</button>
+                            </div>
+                            <div class="mt-2 flex flex-col gap-0.5">
+                                <p class="text-[8px] font-bold text-emerald-600 uppercase italic">✓ 5+ equipos: 10% Descuento</p>
+                                <p class="text-[8px] font-bold text-emerald-700 uppercase italic">✓ 10+ equipos: 20% Descuento</p>
                             </div>
                         </div>
                     </div>
@@ -140,7 +158,7 @@
             </section>
 
             <!-- 2. DATOS PRESTADOR Y 3. DATOS CLIENTE -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                 <section>
                     <h3 class="text-blue-600 font-bold mb-4 text-xs uppercase tracking-widest">2. Datos del Prestador</h3>
                     <input type="text" placeholder="Nombre o Razón Social" class="w-full border-b border-slate-200 py-2 text-sm outline-none mb-3 bg-transparent">
@@ -160,7 +178,7 @@
             </div>
 
             <!-- 4. DETALLES DEL TRABAJO -->
-            <section class="mb-8">
+            <section class="mb-6">
                 <h3 class="text-blue-600 font-bold mb-3 flex items-center gap-2 text-xs uppercase tracking-widest">
                     <span class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px]">4</span>
                     Detalles del Trabajo
@@ -169,11 +187,11 @@
                     <p class="text-[9px] font-bold text-blue-700 uppercase mb-1">Alcance del Soporte:</p>
                     <p id="desc-dinamica" class="text-[11px] text-blue-900 italic leading-snug">Cargando descripción...</p>
                 </div>
-                <textarea rows="3" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-b-xl text-slate-600 text-xs focus:bg-white focus:ring-1 focus:ring-blue-200 outline-none transition-all resize-none" placeholder="Escriba aquí observaciones adicionales o peticiones especiales..."></textarea>
+                <textarea rows="2" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-b-xl text-slate-600 text-xs focus:bg-white focus:ring-1 focus:ring-blue-200 outline-none transition-all resize-none" placeholder="Escriba aquí observaciones adicionales o peticiones especiales..."></textarea>
             </section>
 
             <!-- TABLA DINÁMICA -->
-            <div id="section-tabla" class="hidden mb-8">
+            <div id="section-tabla" class="hidden mb-6">
                 <div class="overflow-hidden border border-slate-100 rounded-xl">
                     <table class="w-full text-left text-[11px]">
                         <thead class="bg-slate-50 text-slate-500 text-[9px] uppercase font-bold border-b border-slate-100">
@@ -192,27 +210,24 @@
             </div>
 
             <!-- BLOQUE FINAL DE INVERSIÓN -->
-            <section class="p-8 bg-slate-900 rounded-2xl text-white shadow-xl overflow-hidden relative border-t-4 border-blue-500">
-                <div class="flex flex-col md:flex-row justify-between items-end gap-8 relative z-10">
-                    
-                    <!-- LADO IZQUIERDO: Información y Vigencia -->
-                    <div class="text-left space-y-2">
-                        <div class="inline-block px-3 py-1 bg-blue-600 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-2">Inversión Final</div>
-                        <p class="text-xs text-slate-400 max-w-[280px] leading-relaxed">
+            <section class="p-6 bg-slate-900 rounded-2xl text-white shadow-xl overflow-hidden relative border-t-4 border-blue-500">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-6 relative z-10">
+                    <div class="text-left space-y-1">
+                        <div class="inline-block px-3 py-1 bg-blue-600 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-1">Inversión Final</div>
+                        <p class="text-[10px] text-slate-400 max-w-[280px] leading-relaxed">
                             Los precios expresados en este documento no incluyen refacciones. Se requiere el 40% de anticipo para iniciar labores.
                         </p>
-                        <div class="flex items-center gap-2 text-blue-400 font-bold text-[10px] uppercase pt-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <div class="flex items-center gap-2 text-blue-400 font-bold text-[9px] uppercase pt-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             Vigencia de la Cotización: 15 días naturales
                         </div>
                     </div>
 
-                    <!-- LADO DERECHO: Totales -->
-                    <div class="text-right flex flex-col items-end gap-3 min-w-[280px]">
-                        <div id="control-horas-final" class="flex items-center gap-3 bg-slate-800 p-2 rounded-lg border border-slate-700 no-print mb-2">
+                    <div class="text-right flex flex-col items-end gap-2 min-w-[240px]">
+                        <div id="control-horas-final" class="flex items-center gap-3 bg-slate-800 p-2 rounded-lg border border-slate-700 no-print">
                             <div class="text-center px-2">
                                 <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Horas</label>
-                                <input type="number" id="simple-horas-qty" value="1" min="1" oninput="updateSimpleTotal()" class="w-12 bg-transparent border-b border-blue-500 text-lg font-bold text-white text-center outline-none">
+                                <input type="number" id="simple-horas-qty" value="1" min="1" oninput="updateSimpleTotal()" class="w-10 bg-transparent border-b border-blue-500 text-lg font-bold text-white text-center outline-none">
                             </div>
                             <div class="text-slate-600 font-bold">×</div>
                             <div class="text-center px-2 border-l border-slate-700">
@@ -221,33 +236,33 @@
                             </div>
                         </div>
 
-                        <div class="pt-2">
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Estimado (MXN)</p>
-                            <p class="text-6xl font-black text-white leading-none tracking-tighter" id="totalDisplay">$0.00</p>
+                        <div class="pt-1">
+                            <p class="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">Total Estimado (MXN)</p>
+                            <p class="text-5xl font-black text-white leading-none tracking-tighter" id="totalDisplay">$0.00</p>
                         </div>
 
-                        <div id="ahorro-total-box" class="hidden bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl w-full text-center mt-2">
-                            <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">¡Ahorro Total Aplicado!</p>
-                            <p id="ahorro-total-val" class="text-3xl font-black text-emerald-400">$0.00</p>
+                        <div id="ahorro-total-box" class="hidden bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl w-full text-center">
+                            <p class="text-[8px] font-black text-emerald-500 uppercase tracking-widest mb-0.5">¡Ahorro Aplicado!</p>
+                            <p id="ahorro-total-val" class="text-2xl font-black text-emerald-400">$0.00</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- FIRMAS -->
-            <div class="mt-16 grid grid-cols-2 gap-20">
+            <div class="mt-12 grid grid-cols-2 gap-20">
                 <div class="text-center">
-                    <div class="border-b-2 border-slate-200 mb-3 h-16"></div>
+                    <div class="border-b-2 border-slate-200 mb-2 h-12"></div>
                     <p class="font-bold text-slate-800 text-[10px] uppercase tracking-widest">Firma del Prestador</p>
                 </div>
                 <div class="text-center">
-                    <div class="border-b-2 border-slate-200 mb-3 h-16"></div>
+                    <div class="border-b-2 border-slate-200 mb-2 h-12"></div>
                     <p class="font-bold text-slate-800 text-[10px] uppercase tracking-widest">Conformidad del Cliente</p>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="mt-12 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 uppercase font-bold">
+            <div class="mt-8 pt-4 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-400 uppercase font-bold">
                 <p>H.G.C. Soluciones Tecnológicas</p>
                 <p>Fecha de emisión: <span id="currentDate"></span></p>
             </div>
@@ -256,10 +271,10 @@
 
     <script>
         /***********************************************************************
-         * CONFIGURACIÓN DE COSTOS Y PRECIOS (MODIFICAR AQUÍ)
+         * CONFIGURACIÓN DE COSTOS Y PRECIOS
          ***********************************************************************/
         
-        // 1. SERVICIOS POR HORA (Modalidades A, B, C)
+        // 1. SERVICIOS POR HORA
         const CONFIG_HORAS = {
             'A': {
                 name: 'Técnico Independiente',
@@ -283,13 +298,13 @@
             laptop: { base: 550, name: 'Mantenimiento Laptop' },
             pc:     { base: 500, name: 'Mantenimiento PC Escritorio' },
             gamer:  { base: 650, name: 'Mantenimiento PC Gamer' },
-            otro:   { base: 650, name: 'Otro Tipo de Equipo' }
+            otro:   { base: 650, name: 'Otro Tipo de Equipo (Sujeto a Aprobación)' } // Texto restaurado
         };
 
-        // 3. REGLAS DE DESCUENTO POR CANTIDAD (Sólo aplica a Equipos)
+        // 3. REGLAS DE DESCUENTO
         const REGLAS_DESCUENTO = {
-            nivel_1: { min: 5,  pct: 10 }, // 5 o más equipos: 10%
-            nivel_2: { min: 10, pct: 20 }  // 10 o más equipos: 20%
+            nivel_1: { min: 5,  pct: 10 }, 
+            nivel_2: { min: 10, pct: 20 }  
         };
 
         /***********************************************************************
@@ -301,7 +316,6 @@
         let itemsTable = [];
 
         function initApp() {
-            // Cargar datos de Horas en la UI
             document.getElementById('lbl-h-a-name').innerText = CONFIG_HORAS['A'].name;
             document.getElementById('lbl-h-a-price').innerHTML = `$${CONFIG_HORAS['A'].price} <span class="text-[10px] font-normal text-slate-400">/ hr</span>`;
             
@@ -311,7 +325,6 @@
             document.getElementById('lbl-h-c-name').innerText = CONFIG_HORAS['C'].name;
             document.getElementById('lbl-h-c-price').innerHTML = `$${CONFIG_HORAS['C'].price} <span class="text-[10px] font-normal text-slate-400">/ hr</span>`;
 
-            // Cargar Selects de Equipos
             const selectsEq = ['eq-tipo', 'mix-e-tipo'];
             selectsEq.forEach(id => {
                 const el = document.getElementById(id);
@@ -324,7 +337,6 @@
                 }
             });
 
-            // Cargar Select de Horas Mixto
             const mixH = document.getElementById('mix-h-tipo');
             mixH.innerHTML = '';
             for (let key in CONFIG_HORAS) {
@@ -350,8 +362,6 @@
             
             document.getElementById('section-tabla').classList.toggle('hidden', tab === 'horas');
             document.getElementById('control-horas-final').classList.toggle('hidden', tab !== 'horas');
-            
-            // El contenedor de alcance debe verse en 'horas' y en 'mixta'
             document.getElementById('alcance-container').classList.toggle('hidden', tab === 'equipos');
 
             if (tab === 'horas') {
@@ -364,7 +374,6 @@
             }
         }
 
-        // Función específica para actualizar el alcance cuando se cambia el select en pestaña Mixta
         function updateAlcanceMixta(key) {
             if (CONFIG_HORAS[key]) {
                 document.getElementById('desc-dinamica').innerText = CONFIG_HORAS[key].desc;
@@ -417,6 +426,7 @@
         function calculateItemEquipo(tipo, cant) {
             const config = CONFIG_EQUIPOS[tipo];
             let pct = 0;
+            // No aplicar descuentos automáticos a "Otro"
             if (tipo !== 'otro') {
                 if (cant >= REGLAS_DESCUENTO.nivel_2.min) pct = REGLAS_DESCUENTO.nivel_2.pct;
                 else if (cant >= REGLAS_DESCUENTO.nivel_1.min) pct = REGLAS_DESCUENTO.nivel_1.pct;
