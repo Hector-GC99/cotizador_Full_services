@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formato de Prestación de Servicios Profesionales</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .form-card {
+            background: white;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.04);
+            border-radius: 16px;
+        }
+        .service-option, .tab-button {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .service-option:hover {
+            transform: translateY(-2px);
+            background-color: #f1f5f9;
+        }
+        .service-option.active {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+        .tab-button {
+            border-bottom-width: 3px;
+            border-bottom-color: transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+            font-weight: 700;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0.5cm; }
+            .form-card { box-shadow: none; border: 1px solid #e2e8f0; border-radius: 0; padding: 1rem !important; }
+            .tab-content { display: block !important; }
+            textarea { border: 1px solid #cbd5e1 !important; height: auto !important; }
+            .service-option { border: 1px solid #e2e8f0 !important; }
+            .service-option.active { background-color: #eff6ff !important; border-color: #3b82f6 !important; }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto">
+        <!-- Encabezado Sistema -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 no-print gap-4">
+            <h1 class="text-xl font-semibold text-slate-400 uppercase tracking-wider">Sistema de Cotización H.G.C.</h1>
+            <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm flex items-center gap-2 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"></path><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Imprimir / PDF
+            </button>
+        </div>
+
+        <!-- Navegación de Pestañas -->
+        <div class="flex border-b border-slate-200 mb-6 no-print overflow-x-auto">
+            <button onclick="switchTab('horas')" id="tab-horas" class="tab-button active px-4 py-3 text-[10px] uppercase tracking-widest whitespace-nowrap">Por Horas</button>
+            <button onclick="switchTab('equipos')" id="tab-equipos" class="tab-button px-4 py-3 text-[10px] uppercase tracking-widest whitespace-nowrap">Por Equipos</button>
+            <button onclick="switchTab('mixta')" id="tab-mixta" class="tab-button px-4 py-3 text-[10px] uppercase tracking-widest whitespace-nowrap">Contratación Mixta</button>
+        </div>
+
+        <div class="form-card p-6 md:p-10">
+            <!-- Header común Documento -->
+            <div class="text-center border-b pb-6 mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 uppercase mb-1">Prestación de Servicios Profesionales</h2>
+                <p class="text-slate-500 font-medium italic text-sm">Soporte Técnico y Mantenimiento de Equipo de Cómputo</p>
+            </div>
+
+            <!-- 1. SELECCIÓN DEL TIPO DE SOPORTE -->
+            <section class="mb-8">
+                <h3 class="text-blue-600 font-bold mb-4 text-xs uppercase tracking-widest flex items-center gap-2">
+                    <span class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px]">1</span>
+                    Seleccione el tipo de Soporte
+                </h3>
+                
+                <div id="selector-horas" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div id="card-hora-a" onclick="selectSimpleHora('A', this)" class="service-option active p-4 rounded-xl border border-slate-200">
+                        <span class="text-[9px] font-bold text-blue-500 uppercase">Modalidad A</span>
+                        <h4 class="font-bold text-slate-800 text-sm" id="lbl-h-a-name">Cargando...</h4>
+                        <p class="text-lg font-bold text-blue-600 mt-1" id="lbl-h-a-price">$0 <span class="text-[10px] font-normal text-slate-400">/ hr</span></p>
+                    </div>
+                    <div id="card-hora-b" onclick="selectSimpleHora('B', this)" class="service-option p-4 rounded-xl border border-slate-200">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase">Modalidad B</span>
+                        <h4 class="font-bold text-slate-800 text-sm" id="lbl-h-b-name">Cargando...</h4>
+                        <p class="text-lg font-bold text-blue-600 mt-1" id="lbl-h-b-price">$0 <span class="text-[10px] font-normal text-slate-400">/ hr</span></p>
+                    </div>
+                    <div id="card-hora-c" onclick="selectSimpleHora('C', this)" class="service-option p-4 rounded-xl border border-slate-200">
+                        <span class="text-[9px] font-bold text-blue-500 uppercase">Modalidad C</span>
+                        <h4 class="font-bold text-slate-800 text-sm" id="lbl-h-c-name">Cargando...</h4>
+                        <p class="text-lg font-bold text-blue-600 mt-1" id="lbl-h-c-price">$0 <span class="text-[10px] font-normal text-slate-400">/ hr</span></p>
+                    </div>
+                </div>
+
+                <div id="selector-equipos" class="hidden no-print mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100 items-end">
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tipo de Equipo</label>
+                            <select id="eq-tipo" class="w-full p-2 rounded border border-slate-300 text-sm bg-white"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cant.</label>
+                            <input type="number" id="eq-cant" value="1" min="1" class="w-full p-2 rounded border border-slate-300 text-sm font-bold bg-white">
+                        </div>
+                        <button onclick="addToList('equipos')" class="bg-slate-800 text-white p-2.5 rounded text-[10px] font-bold uppercase hover:bg-slate-700 transition-colors shadow-sm">Agregar</button>
+                    </div>
+                </div>
+
+                <div id="selector-mixta" class="hidden no-print mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 border rounded-xl bg-slate-50 border-slate-200">
+                            <p class="text-[10px] font-bold text-blue-600 uppercase mb-2">Servicios por Hora</p>
+                            <div class="flex gap-2">
+                                <select id="mix-h-tipo" onchange="updateAlcanceMixta(this.value)" class="flex-1 p-2 rounded border border-slate-300 text-xs bg-white"></select>
+                                <input type="number" id="mix-h-cant" value="1" min="1" class="w-14 p-2 rounded border border-slate-300 text-xs text-center font-bold bg-white">
+                                <button onclick="addToList('mixta-h')" class="bg-blue-600 text-white px-3 rounded text-[10px] font-bold uppercase">√</button>
+                            </div>
+                        </div>
+                        <div class="p-4 border rounded-xl bg-slate-50 border-slate-200">
+                            <p class="text-[10px] font-bold text-slate-600 uppercase mb-2">Equipos</p>
+                            <div class="flex gap-2">
+                                <select id="mix-e-tipo" class="flex-1 p-2 rounded border border-slate-300 text-xs bg-white"></select>
+                                <input type="number" id="mix-e-cant" value="1" min="1" class="w-14 p-2 rounded border border-slate-300 text-xs text-center font-bold bg-white">
+                                <button onclick="addToList('mixta-e')" class="bg-slate-800 text-white px-3 rounded text-[10px] font-bold uppercase">√</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. DATOS PRESTADOR Y 3. DATOS CLIENTE -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-8">
+                <section>
+                    <h3 class="text-blue-600 font-bold mb-4 text-xs uppercase tracking-widest">2. Datos del Prestador</h3>
+                    <input type="text" placeholder="Nombre o Razón Social" class="w-full border-b border-slate-200 py-2 text-sm outline-none mb-3 bg-transparent">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="RFC" class="w-full border-b border-slate-200 py-2 text-sm outline-none bg-transparent">
+                        <input type="text" placeholder="Teléfono" class="w-full border-b border-slate-200 py-2 text-sm outline-none bg-transparent">
+                    </div>
+                </section>
+                <section>
+                    <h3 class="text-blue-600 font-bold mb-4 text-xs uppercase tracking-widest">3. Datos del Cliente</h3>
+                    <input type="text" placeholder="Empresa / Cliente" class="w-full border-b border-slate-200 py-2 text-sm outline-none mb-3 bg-transparent">
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" placeholder="RFC" class="w-full border-b border-slate-200 py-2 text-sm outline-none bg-transparent">
+                        <input type="text" placeholder="Teléfono" class="w-full border-b border-slate-200 py-2 text-sm outline-none bg-transparent">
+                    </div>
+                </section>
+            </div>
+
+            <!-- 4. DETALLES DEL TRABAJO -->
+            <section class="mb-8">
+                <h3 class="text-blue-600 font-bold mb-3 flex items-center gap-2 text-xs uppercase tracking-widest">
+                    <span class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center text-[10px]">4</span>
+                    Detalles del Trabajo
+                </h3>
+                <div id="alcance-container" class="bg-blue-50 p-4 rounded-t-xl border-l-4 border-blue-500 mb-0">
+                    <p class="text-[9px] font-bold text-blue-700 uppercase mb-1">Alcance del Soporte:</p>
+                    <p id="desc-dinamica" class="text-[11px] text-blue-900 italic leading-snug">Cargando descripción...</p>
+                </div>
+                <textarea rows="3" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-b-xl text-slate-600 text-xs focus:bg-white focus:ring-1 focus:ring-blue-200 outline-none transition-all resize-none" placeholder="Escriba aquí observaciones adicionales o peticiones especiales..."></textarea>
+            </section>
+
+            <!-- TABLA DINÁMICA -->
+            <div id="section-tabla" class="hidden mb-8">
+                <div class="overflow-hidden border border-slate-100 rounded-xl">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-50 text-slate-500 text-[9px] uppercase font-bold border-b border-slate-100">
+                            <tr>
+                                <th class="px-4 py-3">Concepto</th>
+                                <th class="px-4 py-3">P. Unitario</th>
+                                <th class="px-4 py-3 text-center">Cant.</th>
+                                <th class="px-4 py-3 text-center">Dcto. %</th>
+                                <th class="px-4 py-3 text-right">Subtotal</th>
+                                <th class="px-4 py-3 text-center no-print">×</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista-conceptos" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- BLOQUE FINAL DE INVERSIÓN -->
+            <section class="p-8 bg-slate-900 rounded-2xl text-white shadow-xl overflow-hidden relative border-t-4 border-blue-500">
+                <div class="flex flex-col md:flex-row justify-between items-end gap-8 relative z-10">
+                    
+                    <!-- LADO IZQUIERDO: Información y Vigencia -->
+                    <div class="text-left space-y-2">
+                        <div class="inline-block px-3 py-1 bg-blue-600 rounded text-[10px] font-black uppercase tracking-[0.2em] mb-2">Inversión Final</div>
+                        <p class="text-xs text-slate-400 max-w-[280px] leading-relaxed">
+                            Los precios expresados en este documento no incluyen refacciones. Se requiere el 40% de anticipo para iniciar labores.
+                        </p>
+                        <div class="flex items-center gap-2 text-blue-400 font-bold text-[10px] uppercase pt-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            Vigencia de la Cotización: 15 días naturales
+                        </div>
+                    </div>
+
+                    <!-- LADO DERECHO: Totales -->
+                    <div class="text-right flex flex-col items-end gap-3 min-w-[280px]">
+                        <div id="control-horas-final" class="flex items-center gap-3 bg-slate-800 p-2 rounded-lg border border-slate-700 no-print mb-2">
+                            <div class="text-center px-2">
+                                <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Horas</label>
+                                <input type="number" id="simple-horas-qty" value="1" min="1" oninput="updateSimpleTotal()" class="w-12 bg-transparent border-b border-blue-500 text-lg font-bold text-white text-center outline-none">
+                            </div>
+                            <div class="text-slate-600 font-bold">×</div>
+                            <div class="text-center px-2 border-l border-slate-700">
+                                <label class="block text-[8px] font-bold text-slate-500 uppercase mb-0.5">Tarifa</label>
+                                <p id="simple-price-label" class="text-base font-bold text-blue-400">$0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Total Estimado (MXN)</p>
+                            <p class="text-6xl font-black text-white leading-none tracking-tighter" id="totalDisplay">$0.00</p>
+                        </div>
+
+                        <div id="ahorro-total-box" class="hidden bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-xl w-full text-center mt-2">
+                            <p class="text-[9px] font-black text-emerald-500 uppercase tracking-widest mb-1">¡Ahorro Total Aplicado!</p>
+                            <p id="ahorro-total-val" class="text-3xl font-black text-emerald-400">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FIRMAS -->
+            <div class="mt-16 grid grid-cols-2 gap-20">
+                <div class="text-center">
+                    <div class="border-b-2 border-slate-200 mb-3 h-16"></div>
+                    <p class="font-bold text-slate-800 text-[10px] uppercase tracking-widest">Firma del Prestador</p>
+                </div>
+                <div class="text-center">
+                    <div class="border-b-2 border-slate-200 mb-3 h-16"></div>
+                    <p class="font-bold text-slate-800 text-[10px] uppercase tracking-widest">Conformidad del Cliente</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="mt-12 pt-6 border-t border-slate-100 flex justify-between items-center text-[10px] text-slate-400 uppercase font-bold">
+                <p>H.G.C. Soluciones Tecnológicas</p>
+                <p>Fecha de emisión: <span id="currentDate"></span></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /***********************************************************************
+         * CONFIGURACIÓN DE COSTOS Y PRECIOS (MODIFICAR AQUÍ)
+         ***********************************************************************/
+        
+        // 1. SERVICIOS POR HORA (Modalidades A, B, C)
+        const CONFIG_HORAS = {
+            'A': {
+                name: 'Técnico Independiente',
+                price: 450,
+                desc: 'Mantenimiento preventivo básico, soporte general y atención a usuarios finales.'
+            },
+            'B': {
+                name: 'Servicio Profesional',
+                price: 600,
+                desc: 'Atención en sitio para empresas, gestión de múltiples equipos y soporte técnico.'
+            },
+            'C': {
+                name: 'Servicio Especializado',
+                price: 750,
+                desc: 'Consultoria de infrestructura, servidores, redes, seguridad, respaldos y sistemas ERP.'
+            }
+        };
+
+        // 2. MANTENIMIENTO POR EQUIPOS
+        const CONFIG_EQUIPOS = {
+            laptop: { base: 550, name: 'Mantenimiento Laptop' },
+            pc:     { base: 500, name: 'Mantenimiento PC Escritorio' },
+            gamer:  { base: 650, name: 'Mantenimiento PC Gamer' },
+            otro:   { base: 650, name: 'Otro Tipo de Equipo' }
+        };
+
+        // 3. REGLAS DE DESCUENTO POR CANTIDAD (Sólo aplica a Equipos)
+        const REGLAS_DESCUENTO = {
+            nivel_1: { min: 5,  pct: 10 }, // 5 o más equipos: 10%
+            nivel_2: { min: 10, pct: 20 }  // 10 o más equipos: 20%
+        };
+
+        /***********************************************************************
+         * LÓGICA DEL SISTEMA
+         ***********************************************************************/
+
+        let currentTab = 'horas';
+        let simpleHoraKey = 'A'; 
+        let itemsTable = [];
+
+        function initApp() {
+            // Cargar datos de Horas en la UI
+            document.getElementById('lbl-h-a-name').innerText = CONFIG_HORAS['A'].name;
+            document.getElementById('lbl-h-a-price').innerHTML = `$${CONFIG_HORAS['A'].price} <span class="text-[10px] font-normal text-slate-400">/ hr</span>`;
+            
+            document.getElementById('lbl-h-b-name').innerText = CONFIG_HORAS['B'].name;
+            document.getElementById('lbl-h-b-price').innerHTML = `$${CONFIG_HORAS['B'].price} <span class="text-[10px] font-normal text-slate-400">/ hr</span>`;
+            
+            document.getElementById('lbl-h-c-name').innerText = CONFIG_HORAS['C'].name;
+            document.getElementById('lbl-h-c-price').innerHTML = `$${CONFIG_HORAS['C'].price} <span class="text-[10px] font-normal text-slate-400">/ hr</span>`;
+
+            // Cargar Selects de Equipos
+            const selectsEq = ['eq-tipo', 'mix-e-tipo'];
+            selectsEq.forEach(id => {
+                const el = document.getElementById(id);
+                el.innerHTML = '';
+                for (let key in CONFIG_EQUIPOS) {
+                    const opt = document.createElement('option');
+                    opt.value = key;
+                    opt.innerText = `${CONFIG_EQUIPOS[key].name} ($${CONFIG_EQUIPOS[key].base})`;
+                    el.appendChild(opt);
+                }
+            });
+
+            // Cargar Select de Horas Mixto
+            const mixH = document.getElementById('mix-h-tipo');
+            mixH.innerHTML = '';
+            for (let key in CONFIG_HORAS) {
+                const opt = document.createElement('option');
+                opt.value = key;
+                opt.innerText = `${CONFIG_HORAS[key].name} ($${CONFIG_HORAS[key].price})`;
+                mixH.appendChild(opt);
+            }
+
+            document.getElementById('currentDate').innerText = new Date().toLocaleDateString('es-MX');
+            switchTab('horas');
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            itemsTable = [];
+            document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + tab).classList.add('active');
+            
+            document.getElementById('selector-horas').classList.toggle('hidden', tab !== 'horas');
+            document.getElementById('selector-equipos').classList.toggle('hidden', tab !== 'equipos');
+            document.getElementById('selector-mixta').classList.toggle('hidden', tab !== 'mixta');
+            
+            document.getElementById('section-tabla').classList.toggle('hidden', tab === 'horas');
+            document.getElementById('control-horas-final').classList.toggle('hidden', tab !== 'horas');
+            
+            // El contenedor de alcance debe verse en 'horas' y en 'mixta'
+            document.getElementById('alcance-container').classList.toggle('hidden', tab === 'equipos');
+
+            if (tab === 'horas') {
+                selectSimpleHora(simpleHoraKey, document.getElementById('card-hora-' + simpleHoraKey.toLowerCase()));
+            } else if (tab === 'mixta') {
+                updateAlcanceMixta(document.getElementById('mix-h-tipo').value);
+                renderTable();
+            } else {
+                renderTable();
+            }
+        }
+
+        // Función específica para actualizar el alcance cuando se cambia el select en pestaña Mixta
+        function updateAlcanceMixta(key) {
+            if (CONFIG_HORAS[key]) {
+                document.getElementById('desc-dinamica').innerText = CONFIG_HORAS[key].desc;
+            }
+        }
+
+        function selectSimpleHora(key, el) {
+            simpleHoraKey = key;
+            const config = CONFIG_HORAS[key];
+            document.querySelectorAll('#selector-horas .service-option').forEach(opt => opt.classList.remove('active'));
+            if(el) el.classList.add('active');
+            
+            document.getElementById('desc-dinamica').innerText = config.desc;
+            document.getElementById('simple-price-label').innerText = formatCurrency(config.price);
+            updateSimpleTotal();
+        }
+
+        function updateSimpleTotal() {
+            if (currentTab !== 'horas') return;
+            const price = CONFIG_HORAS[simpleHoraKey].price;
+            const qty = parseInt(document.getElementById('simple-horas-qty').value) || 0;
+            const total = price * qty;
+            document.getElementById('totalDisplay').innerText = formatCurrency(total);
+            document.getElementById('ahorro-total-box').classList.add('hidden');
+        }
+
+        function addToList(origin) {
+            let item = {};
+            if (origin === 'equipos') {
+                const tipo = document.getElementById('eq-tipo').value;
+                const cant = parseInt(document.getElementById('eq-cant').value) || 0;
+                if (cant <= 0) return;
+                item = calculateItemEquipo(tipo, cant);
+            } else if (origin === 'mixta-h') {
+                const key = document.getElementById('mix-h-tipo').value;
+                const cant = parseInt(document.getElementById('mix-h-cant').value) || 0;
+                if (cant <= 0) return;
+                const conf = CONFIG_HORAS[key];
+                item = { desc: conf.name, priceOrig: conf.price, priceFinal: conf.price, qty: cant, total: conf.price * cant, pct: 0, alcance: conf.desc };
+            } else if (origin === 'mixta-e') {
+                const tipo = document.getElementById('mix-e-tipo').value;
+                const cant = parseInt(document.getElementById('mix-e-cant').value) || 0;
+                if (cant <= 0) return;
+                item = calculateItemEquipo(tipo, cant);
+            }
+            itemsTable.push(item);
+            renderTable();
+        }
+
+        function calculateItemEquipo(tipo, cant) {
+            const config = CONFIG_EQUIPOS[tipo];
+            let pct = 0;
+            if (tipo !== 'otro') {
+                if (cant >= REGLAS_DESCUENTO.nivel_2.min) pct = REGLAS_DESCUENTO.nivel_2.pct;
+                else if (cant >= REGLAS_DESCUENTO.nivel_1.min) pct = REGLAS_DESCUENTO.nivel_1.pct;
+            }
+            const finalPrice = config.base * (1 - (pct / 100));
+            return { desc: config.name, priceOrig: config.base, priceFinal: finalPrice, qty: cant, total: finalPrice * cant, pct: pct };
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('lista-conceptos');
+            tbody.innerHTML = '';
+            let total = 0;
+            let ahorro = 0;
+
+            if (itemsTable.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-300 italic">Agregue conceptos para visualizar la tabla...</td></tr>`;
+                document.getElementById('totalDisplay').innerText = '$0.00';
+                document.getElementById('ahorro-total-box').classList.add('hidden');
+                return;
+            }
+
+            itemsTable.forEach((it, idx) => {
+                total += it.total;
+                ahorro += (it.priceOrig * it.qty) - it.total;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="px-4 py-3"><div class="font-bold text-slate-800">${it.desc}</div>${it.alcance ? `<div class="text-[9px] text-slate-400 italic">${it.alcance}</div>` : ''}</td>
+                    <td class="px-4 py-3 text-slate-400">${formatCurrency(it.priceOrig)}</td>
+                    <td class="px-4 py-3 text-center font-bold text-slate-700">${it.qty}</td>
+                    <td class="px-4 py-3 text-center">${it.pct > 0 ? `<span class="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-bold">-${it.pct}%</span>` : '-'}</td>
+                    <td class="px-4 py-3 text-right font-bold text-slate-900">${formatCurrency(it.total)}</td>
+                    <td class="px-4 py-3 text-center no-print"><button onclick="removeItem(${idx})" class="text-red-400 hover:text-red-600">×</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalDisplay').innerText = formatCurrency(total);
+            const ahorroBox = document.getElementById('ahorro-total-box');
+            if (ahorro > 0) {
+                ahorroBox.classList.remove('hidden');
+                document.getElementById('ahorro-total-val').innerText = formatCurrency(ahorro);
+            } else {
+                ahorroBox.classList.add('hidden');
+            }
+        }
+
+        function removeItem(idx) { itemsTable.splice(idx, 1); renderTable(); }
+        function formatCurrency(v) { return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(v); }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
